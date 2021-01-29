@@ -135,18 +135,19 @@ map.on('click', function(e) {
 
 top3 = () => {
 
+    // instantiate this for readability
     var me = myLocation.features[0].geometry.coordinates
-    var tempFixArray = []
 
+    // Map through mcData (large geoJSON array) and return coordinate
+    // distance function from turf. Then sort to get in ascending order
+    // (smallest to largest) 
     var nearestArray = mcData.features.map((i) => {
-
-        tempFixArray.push([i.properties.Name, turf.distance(i, me, 'miles').toFixed(2)])
 
         return turf.distance(i, me, 'miles').toFixed(2)
 
     }).sort(function(a, b) { return a - b; });
 
-    // Hard coded names, distances are correct
+    // Hard coded names :(, distances are correct
     console.log(
         '\n',
         "Your closest 3 points are: ", '\n \n'

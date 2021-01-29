@@ -18,6 +18,7 @@ var mcData =  {
     type: 'FeatureCollection',
     features: [
         { 
+        // I prettified this geoJSON for readability, it's nothing different from the below objects
             type: 'Feature', 
             properties: { 
                 Name: "McDonald's #1",
@@ -109,7 +110,7 @@ map.on('click', function(e) {
     var myLocationFeature = myLocationFeatures[0];
   
     var nearestMcData = turf.nearest(myLocationFeature, mcData);
-
+        
     top3()
     
     if (nearestMcData !== null) {
@@ -147,7 +148,7 @@ top3 = () => {
 
     }).sort(function(a, b) { return a - b; });
 
-    // Hard coded names :(, distances are correct
+    // Hard coded names :(, distances are correct, as they come from properly sorted array
     console.log(
         '\n',
         "Your closest 3 points are: ", '\n \n'

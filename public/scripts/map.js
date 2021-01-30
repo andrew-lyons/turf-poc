@@ -95,13 +95,14 @@ map.on('click', function(e) {
     var i = 0;
     var closestPoints = [];
 
-    tfC = mcData
+    tfC = turf.featureCollection(mcData.features)
     tpC = turf.point(myLocation.geometry.coordinates)
-    console.log(tpC)
-    console.log(myLocation.geometry.coordinates)
 
     while(i < 13) {
-        var geoJ = turf.nearestPoint(myLocation.geometry.coordinates, tfC)
+        console.log(tpC)
+        console.log(myLocation.geometry)
+        var geoJ = turf.nearestPoint(tpC, tfC)
+        console.log(geoJ)
         closestPoints.push(geoJ);
         var id = geoJ.properties.featureIndex;
         console.log(geoJ.properties)
@@ -140,7 +141,7 @@ formatToGeo = (data) => {
                 },
                 geometry: {
                     type: 'Point',
-                    coordinates: [parseFloat(data[i].lonlat[0]), parseFloat(data[i].lonlat[1])]
+                    coordinates: [data[i].lonlat[0], data[i].lonlat[1]]
                 }
             }
         )

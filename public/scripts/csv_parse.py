@@ -1,7 +1,7 @@
 import csv
 import json
 
-path = 'turf-poc/public/json'
+path = 'public/json'
 
 file = F"{path}/mcd_hic_fc_p1.csv"
 json_file = F"{path}/mcd_hic_fc_p1.json"
@@ -32,9 +32,14 @@ def read_CSV(file, json_file):
         for row in reader:
             csv_rows.extend([{preffered_fieldnames_with_simple[field[i]]:row[field[i]] for i in range(len(field))}])
         for row in csv_rows:
-            row['lonlat'] = [row['lon'], row['lat']]
-            row.pop('lat')
-            row.pop('lon')
+            if row['lon'] != "#N/A":
+                row['lonlat'] = [float(row['lon']), float(row['lat'])]
+                row.pop('lat')
+                row.pop('lon')
+            else:
+                row['lonlat'] = [10, 10]
+                row.pop('lat')
+                row.pop('lon')
         convert_write_json(csv_rows, json_file)
 
 #Convert csv data into json
@@ -42,7 +47,7 @@ def convert_write_json(data, json_file):
     with open(json_file, "w") as f:
         #pretty parse
         #f.write(json.dumps(data, sort_keys=False, indent=4, separators=(',', ': ')))
-        
+
         #one-line parse
         f.write(json.dumps(data))
 

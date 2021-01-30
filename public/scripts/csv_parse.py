@@ -1,7 +1,7 @@
 import csv
 import json
 
-path = 'public/json'
+path = 'turf-poc/public/json'
 
 file = F"{path}/mcd_hic_fc_p1.csv"
 json_file = F"{path}/mcd_hic_fc_p1.json"
@@ -28,18 +28,9 @@ def read_CSV(file, json_file):
         }
         field = preferred_fieldnames
 
-        #Could be more condensed. But doesn't need to be fancy yes? :)
+        #Captures the awkward "#N/A" lon/lat store locations cases and skips
         for row in reader:
-            csv_rows.extend([{preffered_fieldnames_with_simple[field[i]]:row[field[i]] for i in range(len(field))}])
-        for row in csv_rows:
-            if row['lon'] != "#N/A":
-                row['lonlat'] = [float(row['lon']), float(row['lat'])]
-                row.pop('lat')
-                row.pop('lon')
-            else:
-                row['lonlat'] = [10, 10]
-                row.pop('lat')
-                row.pop('lon')
+            csv_rows.extend([{preffered_fieldnames_with_simple[field[i]]:row[field[i]] for i in range(len(field)) if row[field[i]] != "#N/A"}])
         convert_write_json(csv_rows, json_file)
 
 #Convert csv data into json
@@ -50,6 +41,5 @@ def convert_write_json(data, json_file):
 
         #one-line parse
         f.write(json.dumps(data))
-
 
 read_CSV(file,json_file)

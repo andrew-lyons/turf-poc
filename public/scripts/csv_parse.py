@@ -30,12 +30,14 @@ def read_CSV(file, json_file):
 
         #Captures the awkward "#N/A" lon/lat store locations cases and skips
         for row in reader:
-                csv_rows.extend([{preferred_dict[field[i]]:row[field[i]] for i in range(len(field)) if row[field[i]] != "#N/A"}])
+            csv_rows.extend([{preferred_dict[field[i]]:row[field[i]] for i in range(len(field)) if row[field[i]] != "#N/A"}])
         for row in csv_rows:
             try:
                 row['lon'] = float(row['lon'])
                 row['lat'] = float(row['lat'])
             except:
+                row['lon'] = 0
+                row['lat'] = 0
                 continue
         convert_write_json(csv_rows, json_file)
 

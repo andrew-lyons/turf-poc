@@ -135,7 +135,7 @@ formatToGeo = (data) => {
                 },
                 geometry: {
                     type: 'Point',
-                    coordinates: [parseFloat(data[i].lonlat[0]), parseFloat(data[i].lonlat[1])]
+                    coordinates: [parseFloat(data[i].lon), parseFloat(data[i].lat)]
                 }
             }
         )

@@ -1,7 +1,7 @@
 import csv
 import json
 
-path = 'turf-poc/public/json'
+path = 'public/json'
 
 file = F"{path}/mcd_hic_fc_p1.csv"
 json_file = F"{path}/mcd_hic_fc_p1.json"
@@ -20,7 +20,7 @@ def read_CSV(file, json_file):
         #remove 'lon' 'lat' and replace with 'lonlat' in geoJSON-ready format
         #3.3MB -> 750kb filesize
         preferred_fieldnames = ["HDQ Owner-Operator Name", "Latitude", "Longitude", "Street Address"]
-        preffered_fieldnames_with_simple = {
+        preferred_dict = {
             "HDQ Owner-Operator Name": "name",
             "Latitude": "lat",
             "Longitude": "lon",
@@ -30,7 +30,13 @@ def read_CSV(file, json_file):
 
         #Captures the awkward "#N/A" lon/lat store locations cases and skips
         for row in reader:
-            csv_rows.extend([{preffered_fieldnames_with_simple[field[i]]:row[field[i]] for i in range(len(field)) if row[field[i]] != "#N/A"}])
+                csv_rows.extend([{preferred_dict[field[i]]:row[field[i]] for i in range(len(field)) if row[field[i]] != "#N/A"}])
+        for row in csv_rows:
+            try:
+                row['lon'] = float(row['lon'])
+                row['lat'] = float(row['lat'])
+            except:
+                continue
         convert_write_json(csv_rows, json_file)
 
 #Convert csv data into json

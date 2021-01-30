@@ -18,7 +18,7 @@ def read_CSV(file, json_file):
         #reduce csv fieldnames to ones needed for geoJSON only
         #replace longform names with short versions
         #remove 'lon' 'lat' and replace with 'lonlat' in geoJSON-ready format
-        #3.3MB -> 750kb filesize
+        #3.3MB -> 733kb filesize
         preferred_fieldnames = ["HDQ Owner-Operator Name", "Latitude", "Longitude", "Street Address"]
         preferred_dict = {
             "HDQ Owner-Operator Name": "name",
@@ -28,7 +28,8 @@ def read_CSV(file, json_file):
         }
         field = preferred_fieldnames
 
-        #Captures the awkward "#N/A" lon/lat store locations cases and skips
+        #Original idea was to skip cases of #N/A lon/lat, but turf requires all float/int coordinates, and breaks with strings.
+        #Because of list comprehension structure I just iterate over twice... much more efficient way out there for sure.
         for row in reader:
             csv_rows.extend([{preferred_dict[field[i]]:row[field[i]] for i in range(len(field)) if row[field[i]] != "#N/A"}])
         for row in csv_rows:

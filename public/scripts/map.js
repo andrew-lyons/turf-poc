@@ -98,6 +98,7 @@ map.on('click', function(e) {
     tfC = turf.featureCollection(mcData.features)
     tpC = turf.point(myLocation.geometry.coordinates)
 
+    // Kept this in map.on click, but could be set up to work with map.on load
     while(i < 100) {
         var geoJ = turf.nearestPoint(tpC, tfC)
         console.log(geoJ)
@@ -124,6 +125,7 @@ map.on('click', function(e) {
     }, 'mcData');
 });
 
+// Bring JSON to geoJSON format
 formatToGeo = (data) => {
     for (i=0; i < data.length; i++) {
         mcData.features.push(
@@ -135,7 +137,7 @@ formatToGeo = (data) => {
                 },
                 geometry: {
                     type: 'Point',
-                    coordinates: [parseFloat(data[i].lon), parseFloat(data[i].lat)]
+                    coordinates: [data[i].lon, data[i].lat]
                 }
             }
         )

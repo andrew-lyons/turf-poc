@@ -95,17 +95,24 @@ map.on('click', function(e) {
     var i = 0;
     var closestPoints = [];
 
+    tfC = mcData
+    tpC = turf.point(myLocation.geometry.coordinates)
+    console.log(tpC)
+    console.log(myLocation.geometry.coordinates)
+
     while(i < 13) {
-        var geoJ = turf.nearest(myLocation, mcData)
+        var geoJ = turf.nearestPoint(myLocation.geometry.coordinates, tfC)
         closestPoints.push(geoJ);
         var id = geoJ.properties.featureIndex;
+        console.log(geoJ.properties)
         //remove from features point that was found
-        mcData.features.splice(id, 1);
+        mcData.features.splice(id, 0);
         i++;
     };
 
+    // This is where the issue is I think. Not sure why, but it only highlights
+    // first feature in the array. If you do closestPoints[0] or [1] etc. it breaks?
     console.log(closestPoints)
-    console.log(typeof(closestPoints))
     map.getSource('nearest-food').setData({
         type: 'FeatureCollection',
         features: closestPoints
@@ -133,7 +140,7 @@ formatToGeo = (data) => {
                 },
                 geometry: {
                     type: 'Point',
-                    coordinates: [data[i].lonlat[0], data[i].lonlat[1]]
+                    coordinates: [parseFloat(data[i].lonlat[0]), parseFloat(data[i].lonlat[1])]
                 }
             }
         )

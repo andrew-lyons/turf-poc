@@ -132,8 +132,10 @@ formatToGeo = (data) => {
             {
                 type: 'Feature',
                 properties: {
-                    Name: data[i].name,
-                    Address: data[i].address
+                    Name: data[i].num,
+                    Address: data[i].addr,
+                    Date: data[i].date
+
                 },
                 geometry: {
                     type: 'Point',

@@ -1,5 +1,7 @@
 import csv
 import json
+import time
+from datetime import datetime
 
 path = 'public/json'
 
@@ -34,6 +36,9 @@ def read_CSV(file, json_file):
         for row in reader:
             csv_rows.extend([{preferred_dict[field[i]]:row[field[i]] for i in range(len(field)) if row[field[i]] != "#N/A"}])
         for row in csv_rows:
+            ms = int(datetime.strptime(row['date'], "%m/%d/%Y").timestamp() * 1000)
+            row['date'] = ms
+
             try:
                 row['lon'] = float(row['lon'])
                 row['lat'] = float(row['lat'])
@@ -52,3 +57,4 @@ def convert_write_json(data, json_file):
         f.write(json.dumps(data))
 
 read_CSV(file,json_file)
+print()

@@ -93,7 +93,7 @@ map.on('mousemove', function(e) {
 map.on('click', function(e) {
 
     //findClosest(a) takes int that just plugs into the while loop like before
-    const closestPoints = findClosest(1000)
+    const closestPoints = findClosest(100)
 
     //checkTime(a, b) returns stores that are due AFTER the first param, non-inclusive. Second param is array to further filter
     const timeFilteredPoints = checkTime("4/20/2021", closestPoints)
@@ -133,6 +133,7 @@ formatToGeo = (data) => {
             }
         )
     }
+    console.log(mcData.features.length)
 }
 
 findClosest = (numStores) => {

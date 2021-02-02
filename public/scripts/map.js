@@ -13,9 +13,10 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiYXNseW9uczAwMSIsImEiOiJja2toZGhxN24wYTFrMm5xa
             }
         };
 
+        // Pass in date and timeFilter returns stores due for the change after the date
         fetch('https://andrew-lyons.github.io/turf-poc/public/json/mcd_hic_fc_p1.json')
             .then((res) => res.json())
-            .then(data => formatToGeo(data))
+            .then(data => timeFilter(data, "2/25/2021"))
 
 var mcData =  {
     type: 'FeatureCollection',
@@ -26,7 +27,6 @@ var myLocation = {
         type: 'Feature',
         properties: {
             Name: 'Me! #1',
-            Address: null
         },
         geometry: {
             type: 'Point',
@@ -92,15 +92,11 @@ map.on('mousemove', function(e) {
 
 map.on('click', function(e) {
 
-    //findClosest(a) takes int that just plugs into the while loop like before
     const closestPoints = findClosest(100)
-
-    //checkTime(a, b) returns stores that are due AFTER the first param, non-inclusive. Second param is array to further filter
-    const timeFilteredPoints = checkTime("4/20/2021", closestPoints)
 
     map.getSource('nearest-food').setData({
         type: 'FeatureCollection',
-        features: timeFilteredPoints
+        features: closestPoints
     });
 
     map.addLayer({
@@ -114,28 +110,7 @@ map.on('click', function(e) {
     }, 'mcData');
 });
 
-// Bring JSON to geoJSON format
-formatToGeo = (data) => {
-    for (i=0; i < data.length; i++) {
-        mcData.features.push(
-            {
-                type: 'Feature',
-                properties: {
-                    Name: data[i].num,
-                    Address: data[i].addr,
-                    Date: timeFilter(data[i])
-
-                },
-                geometry: {
-                    type: 'Point',
-                    coordinates: [data[i].lon, data[i].lat]
-                }
-            }
-        )
-    }
-    console.log(mcData.features.length)
-}
-
+// Find closest stores. Pings mcData.features in main scope, only takes in number of stores (i.e. 100 closest, 10 closest, etc.)
 findClosest = (numStores) => {
     var i = 0;
     var closestPoints = [];
@@ -143,7 +118,6 @@ findClosest = (numStores) => {
     tfC = turf.featureCollection(mcData.features)
     tpC = turf.point(myLocation.geometry.coordinates)
 
-    // Kept this in map.on click, but could be set up to work with map.on load
     while(i < numStores) {
         var geoJ = turf.nearestPoint(tpC, tfC)
         closestPoints.push(geoJ);
@@ -155,20 +129,18 @@ findClosest = (numStores) => {
     return closestPoints
 };
 
-checkTime = (date, closestPoints) => {
+// Filter displayed points based on date passed in
+timeFilter = (data, date) => {
     const dayMS = 86399000; //length of given day from 00:00:00 to 23:59:59 in ms, good enough for this use case
-    var dueStores = [];
-    var lateStores = [];
 
-    var timeFiltered = closestPoints.map((entry) => {
-        var daysOut = Math.floor((entry.properties.Date - Date.parse(date)) / dayMS)  // .floor() gives us accurate # days until due date
+    var timeFiltered = data.map((entry) => {
+        var daysOut = Math.floor((entry.date - Date.parse(date)) / dayMS)  // .floor() gives us accurate # days until due date
         
         //just change > to >= for INCLUSIVE, otherwise same-days are passed
         if (Math.sign(daysOut) > 0) {
-            dueStores.push("Store #" + entry.properties.Name + " is due in " + daysOut + " days")
             return entry
         } else {
-            lateStores.push("Store #" + entry.properties.Name + " was due " + Math.abs(daysOut) + " days ago!")
+            console.log(entry + " is past due")
         }
     });
 
@@ -177,11 +149,28 @@ checkTime = (date, closestPoints) => {
         return el != null && el != undefined
     })
 
-    console.log([dueStores, lateStores]) //Not sure if usable but might be a nice cherry
+    // Set features to geoJSON returned from formatToGeo
+    mcData.features = formatToGeo(filteredArray)
+}
 
-    return(filteredArray)
-};
+// Bring JSON to geoJSON format
+formatToGeo = (data) => {
+    mcData_formatted = []
+    for (i=0; i < data.length; i++) {
+        mcData_formatted.push(
+            {
+                type: 'Feature',
+                properties: {
+                    Name: "Store #" + data[i].num,
+                    Date: data[i].date
 
-timeFilter = (obj) => {
-    console.log(obj.date)
+                },
+                geometry: {
+                    type: 'Point',
+                    coordinates: [data[i].lon, data[i].lat]
+                }
+            }
+        )
+    }
+    return mcData_formatted
 }

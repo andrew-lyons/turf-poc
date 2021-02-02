@@ -14,6 +14,7 @@ json_file = F"{path}/mcd_hic_fc_p1.json"
 
 def read_CSV(file, json_file):
     csv_rows = []
+    csv_rows_formatted = []
     with open(file, encoding='mac_roman') as csvfile:
         reader = csv.DictReader(csvfile)
         
@@ -34,14 +35,15 @@ def read_CSV(file, json_file):
         for row in reader:
             csv_rows.extend([{preferred_dict[field[i]]:row[field[i]] for i in range(len(field))}])
         for row in csv_rows:
-            ms = int(datetime.strptime(row['date'], "%m/%d/%Y").timestamp() * 1000)
-            try:
-                row['lon'] = float(row['lon'])
-                row['lat'] = float(row['lat'])
+            if row['lat'] != "#N/A":
+                ms = int(datetime.strptime(row['date'], "%m/%d/%Y").timestamp() * 1000)
                 row['date'] = ms
-            except:
-                csv_rows.pop(csv_rows.index(row))
-        convert_write_json(csv_rows, json_file)
+                row['lat'] = float(row['lat'])
+                row['lon'] = float(row['lon'])
+                csv_rows_formatted.append(row)
+            else:
+                print(row)
+        convert_write_json(csv_rows_formatted, json_file)
 
 #Convert csv data into json
 def convert_write_json(data, json_file):
@@ -53,4 +55,3 @@ def convert_write_json(data, json_file):
         f.write(json.dumps(data))
 
 read_CSV(file,json_file)
-print()

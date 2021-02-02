@@ -10,18 +10,12 @@ json_file = F"{path}/mcd_hic_fc_p1.json"
 
 #Read CSV File
 #No logic for checking if csv has proper format, limited to csv with headers in first row
-#3.3 MB to
 
 def read_CSV(file, json_file):
     csv_rows = []
     csv_rows_formatted = []
     with open(file, encoding='mac_roman') as csvfile:
         reader = csv.DictReader(csvfile)
-        
-        #reduce csv fieldnames to ones needed for geoJSON only
-        #replace longform names with short versions
-        #remove 'lon' 'lat' and replace with 'lonlat' in geoJSON-ready format
-        #3.3MB -> 733kb filesize
         preferred_dict = {
             "Flavor Change Schedule Date": "date",
             "Store Number": "num",
@@ -30,8 +24,8 @@ def read_CSV(file, json_file):
         }
         field = list(preferred_dict.keys())
 
-        #Original idea was to skip cases of #N/A lon/lat, but turf requires all float/int coordinates, and breaks with strings.
-        #Because of list comprehension structure I just iterate over twice... much more efficient way out there for sure.
+        #Make csv_rows in [ {}, {} ... ] format
+        #Append to csv_rows_formatted with proper formatting
         for row in reader:
             csv_rows.extend([{preferred_dict[field[i]]:row[field[i]] for i in range(len(field))}])
         for row in csv_rows:

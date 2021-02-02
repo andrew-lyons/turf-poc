@@ -140,7 +140,7 @@ timeFilter = (data, date) => {
         if (Math.sign(daysOut) > 0) {
             return entry
         } else {
-            console.log(entry + " is past due")
+            console.log("")
         }
     });
 

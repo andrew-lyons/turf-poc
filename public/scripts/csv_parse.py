@@ -26,25 +26,21 @@ def read_CSV(file, json_file):
             "Store Number": "num",
             "Latitude": "lat",
             "Longitude": "lon",
-            "Street Address": "addr"
         }
-        print(list(preferred_dict.keys()))
         field = list(preferred_dict.keys())
 
         #Original idea was to skip cases of #N/A lon/lat, but turf requires all float/int coordinates, and breaks with strings.
         #Because of list comprehension structure I just iterate over twice... much more efficient way out there for sure.
         for row in reader:
-            csv_rows.extend([{preferred_dict[field[i]]:row[field[i]] for i in range(len(field)) if row[field[i]] != "#N/A"}])
+            csv_rows.extend([{preferred_dict[field[i]]:row[field[i]] for i in range(len(field))}])
         for row in csv_rows:
             ms = int(datetime.strptime(row['date'], "%m/%d/%Y").timestamp() * 1000)
-            row['date'] = ms
-
             try:
                 row['lon'] = float(row['lon'])
                 row['lat'] = float(row['lat'])
+                row['date'] = ms
             except:
                 csv_rows.pop(csv_rows.index(row))
-                continue
         convert_write_json(csv_rows, json_file)
 
 #Convert csv data into json

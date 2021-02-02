@@ -123,7 +123,7 @@ formatToGeo = (data) => {
                 properties: {
                     Name: data[i].num,
                     Address: data[i].addr,
-                    Date: Date.parse(data[i].date)
+                    Date: timeFilter(data[i])
 
                 },
                 geometry: {
@@ -181,3 +181,7 @@ checkTime = (date, closestPoints) => {
 
     return(filteredArray)
 };
+
+timeFilter = (obj) => {
+    console.log(obj.date)
+}

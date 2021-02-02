@@ -92,26 +92,15 @@ map.on('mousemove', function(e) {
 
 map.on('click', function(e) {
 
-    var i = 0;
-    var closestPoints = [];
+    //findClosest(a) takes int that just plugs into the while loop like before
+    const closestPoints = findClosest(1000)
 
-    tfC = turf.featureCollection(mcData.features)
-    tpC = turf.point(myLocation.geometry.coordinates)
-
-    // Kept this in map.on click, but could be set up to work with map.on load
-    while(i < 100) {
-        var geoJ = turf.nearestPoint(tpC, tfC)
-        console.log(geoJ)
-        closestPoints.push(geoJ);
-        var id = geoJ.properties.featureIndex;
-        //remove from features point that was found
-        mcData.features.splice(id, 1);
-        i++;
-    };
+    //checkTime(a, b) returns stores that are due AFTER the first param, non-inclusive. Second param is array to further filter
+    const timeFilteredPoints = checkTime("4/20/2021", closestPoints)
 
     map.getSource('nearest-food').setData({
         type: 'FeatureCollection',
-        features: closestPoints
+        features: timeFilteredPoints
     });
 
     map.addLayer({
@@ -134,7 +123,7 @@ formatToGeo = (data) => {
                 properties: {
                     Name: data[i].num,
                     Address: data[i].addr,
-                    Date: data[i].date
+                    Date: Date.parse(data[i].date)
 
                 },
                 geometry: {
@@ -145,3 +134,49 @@ formatToGeo = (data) => {
         )
     }
 }
+
+findClosest = (numStores) => {
+    var i = 0;
+    var closestPoints = [];
+
+    tfC = turf.featureCollection(mcData.features)
+    tpC = turf.point(myLocation.geometry.coordinates)
+
+    // Kept this in map.on click, but could be set up to work with map.on load
+    while(i < numStores) {
+        var geoJ = turf.nearestPoint(tpC, tfC)
+        closestPoints.push(geoJ);
+        var id = geoJ.properties.featureIndex;
+        //remove from features point that was found
+        mcData.features.splice(id, 1);
+        i++;
+    };
+    return closestPoints
+};
+
+checkTime = (date, closestPoints) => {
+    const dayMS = 86399000; //length of given day from 00:00:00 to 23:59:59 in ms, good enough for this use case
+    var dueStores = [];
+    var lateStores = [];
+
+    var timeFiltered = closestPoints.map((entry) => {
+        var daysOut = Math.floor((entry.properties.Date - Date.parse(date)) / dayMS)  // .floor() gives us accurate # days until due date
+        
+        //just change > to >= for INCLUSIVE, otherwise same-days are passed
+        if (Math.sign(daysOut) > 0) {
+            dueStores.push("Store #" + entry.properties.Name + " is due in " + daysOut + " days")
+            return entry
+        } else {
+            lateStores.push("Store #" + entry.properties.Name + " was due " + Math.abs(daysOut) + " days ago!")
+        }
+    });
+
+    //Remove empty entries made from logic, can't skip in .map()
+    var filteredArray = timeFiltered.filter((el) => {
+        return el != null && el != undefined
+    })
+
+    console.log([dueStores, lateStores]) //Not sure if usable but might be a nice cherry
+
+    return(filteredArray)
+};

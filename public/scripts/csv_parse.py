@@ -3,7 +3,7 @@ import json
 import time
 from datetime import datetime
 
-path = 'public/json'
+path = '../json'
 
 file = F"{path}/mcd_hic_fc_p1.csv"
 json_file = F"{path}/mcd_hic_fc_p1.json"
@@ -19,6 +19,10 @@ def read_CSV(file, json_file):
         preferred_dict = {
             "Flavor Change Schedule Date": "date",
             "Store Number": "num",
+            "Street Address": "a",
+            "City": "c",
+            "State": "s",
+            "Zip": "z",
             "Latitude": "lat",
             "Longitude": "lon",
         }

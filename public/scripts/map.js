@@ -2,7 +2,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiYXNseW9uczAwMSIsImEiOiJja2toZGhxN24wYTFrMm5xa
         var map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/light-v10',
-            center: [-81.455, 39.415],
+            center: [-88.099845, 41.6354154],
             zoom: 8
             });
         var linestring = {
@@ -16,7 +16,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiYXNseW9uczAwMSIsImEiOiJja2toZGhxN24wYTFrMm5xa
         // Pass in date and timeFilter returns stores due for the change after the date
         fetch('https://andrew-lyons.github.io/turf-poc/public/json/mcd_hic_fc_p1.json')
             .then((res) => res.json())
-            .then(data => timeFilter(data, "2/25/2021"))
+            .then(data => timeFilter(data, "2/15/2021"))
 
 var mcData =  {
     type: 'FeatureCollection',
@@ -30,11 +30,13 @@ var myLocation = {
         },
         geometry: {
             type: 'Point',
-            coordinates: [-81.433140, 39.327393]
+            coordinates: [-88.099845, 41.6354154]
         }
     };
 
 map.on('load', function() {
+
+    console.log(myLocation.geometry.coordinates)
 
     map.addLayer({
         id: 'mcData',
@@ -92,7 +94,7 @@ map.on('mousemove', function(e) {
 
 map.on('click', function(e) {
 
-    const closestPoints = findClosest(100)
+    const closestPoints = findClosest(139)
 
     map.getSource('nearest-food').setData({
         type: 'FeatureCollection',
@@ -126,18 +128,22 @@ findClosest = (numStores) => {
         mcData.features.splice(id, 1);
         i++;
     };
-    return closestPoints
+    //console.log(closestPoints)
+    var storeNums = closestPoints.map((s) => {
+        return s.properties.Name
+    })
+    console.log(storeNums)
 };
 
 // Filter displayed points based on date passed in
-timeFilter = (data, date) => {
+function timeFilter(data, date) {
     const dayMS = 86399000; //length of given day from 00:00:00 to 23:59:59 in ms, good enough for this use case
 
     var timeFiltered = data.map((entry) => {
         var daysOut = Math.floor((entry.date - Date.parse(date)) / dayMS)  // .floor() gives us accurate # days until due date
         
         //just change > to >= for INCLUSIVE, otherwise same-days are passed
-        if (Math.sign(daysOut) > 0) {
+        if (Math.sign(daysOut) <= 0) {
             return entry
         } else {
             console.log("")
@@ -154,7 +160,7 @@ timeFilter = (data, date) => {
 }
 
 // Bring JSON to geoJSON format
-formatToGeo = (data) => {
+function formatToGeo(data) {
     mcData_formatted = []
     for (i=0; i < data.length; i++) {
         mcData_formatted.push(

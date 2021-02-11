@@ -5,8 +5,8 @@ from datetime import datetime
 
 path = 'public/json'
 
-file = F"{path}/mcd_hic_fc_p1.csv"
-json_file = F"{path}/mcd_hic_fc_p1.json"
+file = F"{path}/mcd_hic_fc_p1 copy.csv"
+json_file = F"{path}/mcd_hic_fc_p1 copy.json"
 
 #Read CSV File
 #No logic for checking if csv has proper format, limited to csv with headers in first row
